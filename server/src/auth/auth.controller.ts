@@ -10,8 +10,8 @@ export const register = async (
 ) => {
   try {
     const data = registerSchema.parse(req.body)
-    const user = await service.register(data.username, data.password)
-    res.json(user)
+    const result = await service.register(data.username, data.password)
+    res.json(result)
   } catch (e) {
     next(e)
   }

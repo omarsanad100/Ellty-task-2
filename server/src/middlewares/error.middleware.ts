@@ -1,5 +1,26 @@
 import type { Request, Response, NextFunction } from 'express'
 
+function isUpperAlphaNumOrUnderscore(value: string): boolean {
+  if (value.length === 0) return false
+  const first = value.charCodeAt(0)
+  const firstIsUpper = first >= 65 && first <= 90
+  if (!firstIsUpper) return false
+
+  for (let i = 1; i < value.length; i += 1) {
+    const code = value.charCodeAt(i)
+    const isUpper = code >= 65 && code <= 90
+    const isNumber = code >= 48 && code <= 57
+    const isUnderscore = code === 95
+    if (!isUpper && !isNumber && !isUnderscore) return false
+  }
+  return true
+}
+
+function messageIncludesAny(message: string, parts: string[]): boolean {
+  const lowered = message.toLowerCase()
+  return parts.some(part => lowered.includes(part))
+}
+
 function readPgDetails(value: unknown): string[] {
   const out: string[] = []
   if (typeof value !== 'object' || value === null) return out
@@ -29,16 +50,27 @@ function getNodeErrorCode(err: unknown): string {
   if (
     'code' in err &&
     typeof err.code === 'string' &&
-    /^[A-Z][A-Z0-9_]+$/.test(err.code)
+    isUpperAlphaNumOrUnderscore(err.code)
   ) {
     return err.code
   }
   return ''
 }
 
+function getBodyParserErrorType(err: unknown): string {
+  if (typeof err !== 'object' || err === null) return ''
+  if ('type' in err && typeof err.type === 'string') return err.type
+  return ''
+}
+
 /** Prisma + driver adapters often hide the real PG error under `cause`. */
 function resolveClientMessage(err: unknown): string {
   if (!(err instanceof Error)) return 'Something went wrong'
+
+  const bodyParserType = getBodyParserErrorType(err)
+  if (bodyParserType === 'entity.parse.failed') {
+    return 'Invalid JSON body. Send valid JSON with Content-Type: application/json.'
+  }
 
   const nodeCode = getNodeErrorCode(err)
   if (nodeCode === 'P2002') {
@@ -74,6 +106,7 @@ function resolveClientMessage(err: unknown): string {
 }
 
 function statusForError(err: unknown): number {
+  const bodyParserType = getBodyParserErrorType(err)
   const msg = err instanceof Error ? err.message : ''
   const code =
     typeof err === 'object' &&
@@ -84,12 +117,27 @@ function statusForError(err: unknown): number {
       : ''
 
   if (code === 'P2002') return 409
-  if (/not found|invalid credentials|unauthorized/i.test(msg)) return 401
+  if (bodyParserType === 'entity.parse.failed') return 400
+  if (
+    messageIncludesAny(msg, [
+      'not found',
+      'invalid credentials',
+      'unauthorized'
+    ])
+  )
+    return 401
   if (
     code === 'ECONNREFUSED' ||
     code === 'ETIMEDOUT' ||
     code === 'ENOTFOUND' ||
-    /P1001|P1008|P1017|connection|ECONNREFUSED|timeout/i.test(msg)
+    messageIncludesAny(msg, [
+      'p1001',
+      'p1008',
+      'p1017',
+      'connection',
+      'econnrefused',
+      'timeout'
+    ])
   )
     return 503
   return 400

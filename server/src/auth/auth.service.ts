@@ -6,9 +6,14 @@ import { signToken } from '../utils/jwt.js'
 export const register = async (username: string, password: string) => {
   const hashed = await hashPassword(password)
 
-  return prisma.user.create({
-    data: { username, password: hashed }
+  const user = await prisma.user.create({
+    data: { username, password: hashed },
+    select: { id: true, username: true, createdAt: true }
   })
+
+  const token = signToken({ userId: user.id })
+
+  return { token, user }
 }
 
 export const login = async (username: string, password: string) => {
@@ -22,5 +27,12 @@ export const login = async (username: string, password: string) => {
 
   const token = signToken({ userId: user.id })
 
-  return { token }
+  return {
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      createdAt: user.createdAt
+    }
+  }
 }
