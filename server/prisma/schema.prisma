@@ -12,4 +12,22 @@ model User {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
+
+  posts Post[]
+}
+
+model Post {
+  id        String  @id @default(uuid())
+  value     Float
+  parentId  String?
+  operation String? // add | sub | mul | div
+  right     Float?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  parent   Post?  @relation("Tree", fields: [parentId], references: [id])
+  children Post[] @relation("Tree")
+
+  createdAt DateTime @default(now())
 }
