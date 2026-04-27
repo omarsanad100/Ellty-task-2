@@ -1,9 +1,12 @@
-import { PrismaClient } from '@prisma/client/extension'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '../../generated/prisma/client.js'
+import { Pool } from 'pg'
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
 
 const prisma = new PrismaClient({
-  adapter: {
-    url: process.env.DATABASE_URL!
-  },
+  adapter,
   log:
     process.env.NODE_ENV === 'development'
       ? ['query', 'error', 'warn']
@@ -22,8 +25,10 @@ const connectDB = async () => {
     }
   }
 }
+
 const disconnectDB = async () => {
   await prisma.$disconnect()
+  await pool.end()
 }
 
 export { prisma, connectDB, disconnectDB }
