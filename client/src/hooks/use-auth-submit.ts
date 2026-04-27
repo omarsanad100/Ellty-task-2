@@ -21,6 +21,19 @@ export const useAuthSubmit = () => {
           ? await loginMutation.mutateAsync(payload)
           : await registerMutation.mutateAsync(payload)
 
+      const token = result?.token
+      const user = result?.user
+      if (
+        typeof token !== 'string' ||
+        typeof user?.id !== 'string' ||
+        typeof user?.username !== 'string' ||
+        typeof user?.createdAt !== 'string'
+      ) {
+        throw new Error('Invalid authentication response from the server.')
+      }
+
+      const displayName = user.username.trim() !== '' ? user.username.trim() : 'there'
+
       sessionStorage.setItem(
         'post_auth_toast',
         JSON.stringify({
@@ -28,11 +41,11 @@ export const useAuthSubmit = () => {
           type: 'success',
           message:
             authMode === 'login'
-              ? `Welcome back, ${result.user.username}!`
-              : `Welcome, ${result.user.username}! Your account is ready.`
+              ? `Welcome back, ${displayName}!`
+              : `Welcome, ${displayName}! Your account is ready.`
         })
       )
-      setAuthSession(result.token, result.user)
+      setAuthSession(token, user)
     } catch (err) {
       const message = getActionErrorMessage(
         err,

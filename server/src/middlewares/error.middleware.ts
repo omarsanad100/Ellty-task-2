@@ -63,6 +63,13 @@ function getBodyParserErrorType(err: unknown): string {
   return ''
 }
 
+/** `Error.cause` exists at runtime in modern Node; avoid requiring ES2022 `lib` for typing. */
+function getErrorCause(error: unknown): unknown {
+  if (typeof error !== 'object' || error === null) return undefined
+  if (!('cause' in error)) return undefined
+  return Reflect.get(error, 'cause')
+}
+
 /** Prisma + driver adapters often hide the real PG error under `cause`. */
 function resolveClientMessage(err: unknown): string {
   if (!(err instanceof Error)) return 'Something went wrong'
@@ -87,13 +94,13 @@ function resolveClientMessage(err: unknown): string {
   }
 
   const parts: string[] = [err.message]
-  let cursor: unknown = err.cause
+  let cursor: unknown = getErrorCause(err)
   let depth = 0
   while (cursor != null && depth < 6) {
     if (cursor instanceof Error) {
       parts.push(cursor.message)
       parts.push(...readPgDetails(cursor))
-      cursor = cursor.cause
+      cursor = getErrorCause(cursor)
     } else {
       parts.push(...readPgDetails(cursor))
       cursor = null

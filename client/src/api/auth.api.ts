@@ -17,11 +17,11 @@ export interface AuthPayload {
 }
 
 export const loginApi = async (payload: AuthPayload): Promise<AuthResponse> => {
-  const { data } = await httpClient.post<AuthResponse>('/auth/login', payload)
+  const { data } = await httpClient.post<AuthResponse>('/login', payload)
   return data
 }
 
 export const registerApi = async (payload: AuthPayload): Promise<AuthResponse> => {
-  const { data } = await httpClient.post<AuthResponse>('/auth/register', payload)
+  const { data } = await httpClient.post<AuthResponse>('/register', payload)
   return data
 }

@@ -92,4 +92,14 @@ npm run build
   - `JWT_SECRET`
   - `PORT` (optional)
 - Frontend can use:
-  - `VITE_API_BASE_URL` (defaults to `http://localhost:3000`)
+  - `VITE_API_BASE_URL` — omit in dev to use **`/api`** + Vite proxy (same as production paths).
+  - `VITE_API_PROXY_TARGET` — dev proxy target (default **`http://localhost:5000`**).
+
+---
+
+## Deploy on Vercel (single project)
+
+1. Connect this repo with **Root Directory** set to the **repository root** (not `client`).
+2. **`vercel.json`** builds **`server`** then **`client`** (runs **`prisma generate`**) and deploys **`api/[...path].ts`** as a Serverless Function; **`functions.includeFiles`** ships **`server/generated`** into the lambda for Prisma.
+3. Add **`DATABASE_URL`**, **`JWT_SECRET`** (and **`NODE_ENV=production`** if you rely on it) in **Project → Environment Variables**.
+4. Redeploy after pushing changes.

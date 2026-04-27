@@ -103,7 +103,7 @@ export const CreateOperationPanel = ({ nodeOptions }: Props) => {
           type='button'
           onClick={onAddOperation}
           disabled={
-            createOperationMutation.isPending || nodeOptions.length === 0
+            createOperationMutation.isPending || (nodeOptions?.length ?? 0) === 0
           }
           className='cursor-pointer rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50'
         >

@@ -31,26 +31,30 @@ const renderTreeNode = (
   index: number,
   depth: number
 ): ReactElement => {
+  const nodeKey = node?.id ?? `tree-${depth}-${index}`
+  const children = node?.children ?? []
   const label = depth === 0 ? `Discussion #${index + 1}` : `Reply #${index + 1}`
   const operationSummary =
-    node.operation && node.right != null
+    node?.operation != null && node?.right != null
       ? `Used ${symbolForOperation(node.operation)} ${node.right}`
       : 'Started the discussion'
 
   return (
-    <li key={node.id} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <li key={nodeKey} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
         <span className="rounded bg-white px-2 py-0.5 text-xs font-semibold text-slate-700">
           {label}
         </span>
-        <span className="text-xs text-slate-500">{formatDate(node.createdAt)}</span>
+        <span className="text-xs text-slate-500">{formatDate(node?.createdAt ?? '')}</span>
       </div>
-      <p className="mt-2 text-sm font-semibold text-slate-900">Current number: {node.value}</p>
+      <p className="mt-2 text-sm font-semibold text-slate-900">
+        Current number: {node?.value ?? '?'}
+      </p>
       <p className="text-sm text-slate-600">{operationSummary}</p>
 
-      {node.children.length > 0 ? (
+      {children.length > 0 ? (
         <ul className="mt-3 grid gap-2 border-l-2 border-slate-200 pl-3">
-          {node.children.map((child, childIndex) =>
+          {children.map((child, childIndex) =>
             renderTreeNode(child, childIndex, depth + 1)
           )}
         </ul>
@@ -60,6 +64,8 @@ const renderTreeNode = (
 }
 
 export const CalculationTreePreview = ({ roots, isLoading }: Props) => {
+  const safeRoots = roots ?? []
+
   return (
     <SectionCard
       title="Community Discussion Thread"
@@ -67,12 +73,12 @@ export const CalculationTreePreview = ({ roots, isLoading }: Props) => {
     >
       <div className="max-h-[24rem] overflow-y-auto pr-1">
         {isLoading ? <p className="text-sm text-slate-500">Loading discussions...</p> : null}
-        {!isLoading && roots.length === 0 ? (
+        {!isLoading && safeRoots.length === 0 ? (
           <p className="text-sm text-slate-500">No discussions yet. Start one with your first number.</p>
         ) : null}
-        {roots.length > 0 ? (
+        {safeRoots.length > 0 ? (
           <ul className="grid gap-3">
-            {roots.map((root, rootIndex) => renderTreeNode(root, rootIndex, 0))}
+            {safeRoots.map((root, rootIndex) => renderTreeNode(root, rootIndex, 0))}
           </ul>
         ) : null}
       </div>

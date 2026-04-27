@@ -28,7 +28,7 @@ export const NavBar = () => {
             onClick={logout}
             className="cursor-pointer rounded-md bg-slate-900 px-2 py-1.5 text-xs font-medium text-white sm:px-3 sm:text-sm"
           >
-            Logout{user ? ` (${user.username})` : ''}
+            Logout{user?.username != null && user.username !== '' ? ` (${user.username})` : ''}
           </button>
         ) : (
           <button

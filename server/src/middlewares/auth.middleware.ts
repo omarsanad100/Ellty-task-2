@@ -23,7 +23,7 @@ function startsWithBearerPrefix(value: string): boolean {
   if (value.length < 6) return false
   if (value.slice(0, 6).toLowerCase() !== 'bearer') return false
   if (value.length === 6) return true
-  const nextChar = value.at(6)
+  const nextChar = value[6]
   return nextChar !== undefined && isWhitespaceChar(nextChar)
 }
 
@@ -60,7 +60,7 @@ export const authMiddleware = (
   if (scheme !== 'bearer' || !token) {
     return res.status(401).json({
       message:
-        'Invalid Authorization format. Expected exactly: Authorization: Bearer <jwt> (paste the token from POST /auth/login, no angle brackets).'
+        'Invalid Authorization format. Expected exactly: Authorization: Bearer <jwt> (paste the token from POST /login, no angle brackets).'
     })
   }
 
@@ -81,7 +81,7 @@ export const authMiddleware = (
   if (!token) {
     return res.status(401).json({
       message:
-        'Invalid Authorization format. Expected exactly: Authorization: Bearer <jwt> (paste the token from POST /auth/login, no angle brackets).'
+        'Invalid Authorization format. Expected exactly: Authorization: Bearer <jwt> (paste the token from POST /login, no angle brackets).'
     })
   }
 
@@ -96,7 +96,7 @@ export const authMiddleware = (
     if (!parsed.success) {
       return res.status(401).json({
         message:
-          'Token is missing userId. Log in again and paste the full token from POST /auth/login.'
+          'Token is missing userId. Log in again and paste the full token from POST /login.'
       })
     }
     Reflect.set(req, 'user', parsed.data)
@@ -104,7 +104,7 @@ export const authMiddleware = (
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       return res.status(401).json({
-        message: 'Token expired. Log in again with POST /auth/login.'
+        message: 'Token expired. Log in again with POST /login.'
       })
     }
     if (err instanceof jwt.JsonWebTokenError) {
@@ -119,7 +119,7 @@ export const authMiddleware = (
           ? ' Often caused by "Bearer Bearer ..." (paste only the eyJ… string in Postman Auth → Bearer Token, not the word Bearer).'
           : ''
       return res.status(401).json({
-        message: `JWT rejected: ${detail}.${hint}${postmanHint} Get a fresh token from POST /auth/login or /auth/register.`,
+        message: `JWT rejected: ${detail}.${hint}${postmanHint} Get a fresh token from POST /login or /register.`,
         detail
       })
     }

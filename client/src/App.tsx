@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
   const treeQuery = useTreeQuery()
-  const roots = treeQuery.data ?? []
+  const roots = Array.isArray(treeQuery.data) ? treeQuery.data : []
   const nodeOptions = useTreeNodeOptions(roots)
   usePostAuthToast()
 
