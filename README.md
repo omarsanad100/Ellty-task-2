@@ -2,15 +2,20 @@
 
 ## Core Technologies
 
-- **Frontend Framework**: React 19 (Vite)
-- **Frontend Language**: TypeScript
-- **Frontend Styling**: Tailwind CSS
+### Frontend
+
+- **Framework**: React 19 (Vite)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
 - **Data Fetching**: TanStack React Query
-- **Frontend State Management**: Zustand
+- **State Management**: Zustand
 - **HTTP Client**: Axios
 - **Notifications**: React Toastify
-- **Backend Runtime**: Node.js + Express
-- **Backend Language**: TypeScript
+
+### Backend
+
+- **Runtime**: Node.js + Express
+- **Language**: TypeScript
 - **Database ORM**: Prisma
 - **Database**: PostgreSQL (Neon-ready)
 - **Validation**: Zod
