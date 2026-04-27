@@ -5,7 +5,7 @@ import { authMiddleware } from '../middlewares/auth.middleware.js'
 
 const router = Router()
 
-router.get('/', controller.getTree)
+router.get('/posts', controller.getTree)
 router.post('/root', authMiddleware, controller.createRoot)
 router.post('/operation', authMiddleware, controller.addOperation)
 

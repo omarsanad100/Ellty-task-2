@@ -19,13 +19,13 @@ export const getTreeApi = async (): Promise<CalculationNode[]> => {
 export const createRootApi = async (
   payload: CreateRootPayload
 ): Promise<CalculationNode> => {
-  const { data } = await httpClient.post<CalculationNode>('/posts/root', payload)
+  const { data } = await httpClient.post<CalculationNode>('/root', payload)
   return data
 }
 
 export const createOperationApi = async (
   payload: CreateOperationPayload
 ): Promise<CalculationNode> => {
-  const { data } = await httpClient.post<CalculationNode>('/posts/operation', payload)
+  const { data } = await httpClient.post<CalculationNode>('/operation', payload)
   return data
 }
